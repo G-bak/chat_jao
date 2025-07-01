@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chat JAO</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossorigin="crossorigin">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Dongle&family=Noto+Sans+KR:wght@100..900&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Dongle&family=Noto+Sans+KR:wght@100..900&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Dongle&family=Noto+Sans+KR:wght@100..900&display=swap"
+            rel="stylesheet">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Dongle&family=Nanum+Gothic&family=Noto+Sans+KR:wght@100..900&display=swap"
+            rel="stylesheet">
+
+        <link href="/static/css/styles.css" rel="stylesheet" />
+
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="sidebar" id="sidebar">
+                <h2>Chat JAO</h2>
+                <div class="questions-list" id="questionsList"></div>
+                <button class="toggle-sidebar-button" onclick="toggleSidebar()">
+                    <img
+                        src="https://img.icons8.com/ios-glyphs/30/ffffff/chevron-left.png"
+                        alt="Toggle Sidebar">
+                </button>
+            </div>
+            <div class="main" id="mainContent">
+                <div class="intro" id="intro-id">
+                    <p>과거 추억을 알고 싶으신가요?<br>회상하고 싶은 추억을 구체적으로 적어주세요!</p>
+                </div>
+                <button
+                    class="toggle-open-button"
+                    id="openSidebarButton"
+                    onclick="openSidebar()">
+                    <img
+                        src="https://img.icons8.com/ios-glyphs/30/ffffff/chevron-right.png"
+                        alt="Open Sidebar">
+                </button>
+            </div>
+            <button
+                class="create-button"
+                onclick="createNewQuestion()"
+                id="btn-create-question">
+                <img
+                    src="https://img.icons8.com/ios-glyphs/30/ffffff/plus-math.png"
+                    alt="Add Question">
+            </button>
+        </div>
+
+        <script src="/static/js/scripts.js"></script>
+    </body>
+</html>

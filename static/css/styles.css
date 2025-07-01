@@ -1,0 +1,533 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+body {
+    font-family: "Noto Sans KR", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    font-weight: 500;
+    color: #464545;
+    position: relative;
+    overflow-y: auto;
+}
+
+.sidebar.hidden {
+    display: none;
+}
+
+.sidebar h2 {
+    margin: 0;
+    font-size: 2.1rem;
+    color: #464646;
+    transition: opacity 0.3s ease;
+    font-family: "Dongle", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    user-select: none;
+}
+
+.sidebar.hidden h2 {
+    opacity: 0;
+    user-select: none;
+}
+
+.create-button {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+    width: 40px;
+    height: 40px;
+    background-color: #b4b4b4;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.create-button img {
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    user-select: none;
+}
+
+.sidebar .questions-list {
+    flex: 1;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.sidebar .question-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 10px 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f4f3f3;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: relative;
+    user-select: none;
+}
+
+.sidebar .question-item:hover {
+    background-color: #dbdbdb;
+}
+
+.sidebar .question-item.active {
+    background-color: #dadada;
+}
+
+.ellipsis-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #a9a9a9;
+    position: relative;
+    font-weight: 500;
+}
+
+.ellipsis-button:hover {
+    background-color: #e1e1e1;
+    border-radius: 3px;
+}
+
+.popup-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    color: black;
+    border: 3px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    z-index: 10;
+}
+
+.learning {
+    width: 90px;
+    right: 93px;
+    display: none;
+    position: absolute;
+    top: 67px;
+    color: black;
+    border: 3px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.moving {
+    width: 90px;
+    right: 93px;
+    display: none;
+    position: absolute;
+    top: 145px;
+    color: black;
+    border: 3px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.popup-menu button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    color: black;
+}
+
+.popup-menu button:hover {
+    background-color: #e2e2e2;
+}
+
+.learning button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    color: black;
+    font-style: italic;
+    position: relative;
+}
+
+.learning button:hover {
+    background: #53b358;
+    color: white;
+    /* 글자 색상 변경 */
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 0.9rem;
+}
+
+.learning button:hover::after {
+    content: '추가';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #53b358;
+    color: white;
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 0.9rem;
+}
+
+.moving button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    color: black;
+    font-weight: 400;
+    position: relative;
+}
+
+.moving button:hover {
+    background: #a7a7a7;
+    color: white;
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 0.9rem;
+}
+
+.moving button:hover::after {
+    content: '모두 이동';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #a7a7a7;
+    color: white;
+    font-family: "Nanum Gothic", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 0.9rem;
+}
+
+.toggle-sidebar-button {
+    position: absolute;
+    top: 27px;
+    right: 25px;
+    width: 30px;
+    height: 30px;
+    background-color: #b4b4b4;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.toggle-sidebar-button img {
+    width: 16px;
+    height: 16px;
+    user-select: none;
+}
+
+.toggle-open-button {
+    display: none;
+    position: absolute;
+    top: 4.5%;
+    left: -8%;
+    width: 30px;
+    height: 30px;
+    background-color: #b4b4b4;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toggle-open-button img {
+    margin-left: 2px;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+}
+
+.sidebar.hidden + .main .toggle-sidebar-button {
+    transform: rotate(180deg);
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.main .intro {
+    display: block;
+    text-align: center;
+    padding: 20px 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.main .intro p {
+    font-size: 24px;
+    color: #5e5e5e;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.chat-container {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto;
+    width: 99%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.chat-message {
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    display: flex;
+    max-width: 100%;
+}
+
+.chat-message.user {
+    justify-content: flex-end;
+    align-self: flex-end;
+}
+
+.chat-message.user span {
+    background-color: #f1f1f1;
+    padding: 8.5px 13.5px;
+    border-radius: 10px;
+    font-weight: 400;
+    margin-right: 5px;
+}
+
+.chat-message.bot {
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.chat-message.bot span {
+    border-radius: 10px;
+    font-weight: 400;
+}
+
+.chat-message span {
+    padding: 3px 5px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 23px;
+}
+
+.chat-message .icon {
+    width: 24px;
+    height: 24px;
+    user-select: none;
+    margin: 0 5px;
+}
+
+.chat-footer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 99.3%;
+    background-color: #ffffff;
+    margin-bottom: 17px;
+}
+
+.chat-footer textarea {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #dadada;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: none;
+    height: 40px;
+}
+
+.chat-footer button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translate(-2%, -50%);
+    padding: 10px 20px;
+    background-color: #b4b4b4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 40px;
+    user-select: none;
+}
+
+.chat-footer button img {
+    width: 20px;
+    height: 20px;
+    user-select: none;
+}
+
+.chat-footer button:hover {
+    background-color: #727272;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 1px 2px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.delete-button:hover {
+    background-color: darkred;
+}
+
+.delete-keyword-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 12px;
+    user-select: none;
+}
+
+.delete-keyword-btn:hover {
+    background-color: #d32f2f;
+}
+
+.toggle-content-btn {
+    background-color: #BDBDBD;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background-color 0.3s;
+    user-select: none;
+}
+
+.toggle-content-btn:hover {
+    background-color: #45a049;
+}
+
+.diary-content {
+    display: none;
+    margin-bottom: 20px;
+}
+
+.announcement {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    color: #959595;
+    width: 100%;
+    text-align: center;
+    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, Helvetica, Apple Color Emoji, Arial, Segoe UI Emoji, Segoe UI Symbol;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+@media only screen and (max-width: 850px) {
+    .announcement {
+        display: none;
+    }
+}
+
+#user-question {
+    outline: none;
+}
