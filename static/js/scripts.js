@@ -1164,7 +1164,7 @@ function ajaxLoadAllData(selectJsonDataString) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/selectAllData",
+            url: "https://acelifetest.com/diary/selectAllData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1208,7 +1208,7 @@ function ajaxInsertQuestionItem(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/insertTalkToBotAll",
+            url: "https://acelifetest.com/diary/insertTalkToBotAll",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1239,7 +1239,7 @@ function ajaxUpdateChatContainer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/updateChatContainer",  // ✅ 수정된 URL
+            url: "https://acelifetest.com/diary/updateChatContainer",  // ✅ 수정된 URL
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1270,7 +1270,7 @@ function ajaxInsertUserQuestion(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/insertTalkToBotData",
+            url: "https://acelifetest.com/diary/insertTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1303,7 +1303,7 @@ function ajaxInsertBotAnswer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/insertTalkToBotData",
+            url: "https://acelifetest.com/diary/insertTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1336,7 +1336,7 @@ function ajaxPreProcessingData(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/PreProcessingData",
+            url: "https://acelifetest.com/diary/PreProcessingData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1369,7 +1369,7 @@ function ajaxDropTable(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/dropTable",
+            url: "https://acelifetest.com/diary/dropTable",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1402,7 +1402,7 @@ function ajaxInsertExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/insertExcludedKeyword",
+            url: "https://acelifetest.com/diary/insertExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1435,7 +1435,7 @@ function ajaxSelectExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/selectExcludedKeyword",
+            url: "https://acelifetest.com/diary/selectExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1481,7 +1481,7 @@ function ajaxUpdateBotAnswer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/updateTalkToBotData",
+            url: "https://acelifetest.com/diary/updateTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1514,7 +1514,7 @@ function ajaxDeleteExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/deleteExcludedKeyword",
+            url: "https://acelifetest.com/diary/deleteExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1547,7 +1547,7 @@ function ajaxSelectInsertExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/selectInsertExcludedKeyword",
+            url: "https://acelifetest.com/diary/selectInsertExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1580,7 +1580,7 @@ function ajaxUpdateQuestionTitle(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "http://localhost:8080/diary/updateQuestionTitle",
+            url: "https://acelifetest.com/diary/updateQuestionTitle",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
