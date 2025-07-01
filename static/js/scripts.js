@@ -1,6 +1,20 @@
 // 로그인한 사용자의 ID를 저장하는 변수입니다.
 const userId = "user1";
 
+const socket = new WebSocket("ws://localhost:8080/ws/diary/" + userId);
+
+socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    const chatContainer = document.getElementById(data.dataId);
+    const chatBody = chatContainer.querySelector('.chat-body');
+
+    const newMessage = document.createElement('div');
+    newMessage.className = 'chat-message ' + data.type;
+    newMessage.innerHTML = data.text;
+    chatBody.appendChild(newMessage);
+    chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: 'smooth' });
+};
+
 // 페이지 로딩 시, 기존 데이터베이스(DB)에서 데이터를 불러옵니다.
 loadAllData();
 
@@ -212,197 +226,109 @@ async function createChatContainer(id, index) {
     return chatContainer;
 }
 
-// 질문 전송
-// 사용자가 채팅 메시지를 입력하고 전송하는 함수입니다.
 async function sendMessage(id) {
-    // 현재 활성화된 채팅 컨테이너를 가져옵니다.
     const chatContainer = document.getElementById(id);
     const chatContainers = document.querySelectorAll('.chat-container');
     const chatArray = Array.from(chatContainers);
-    // 현재 채팅창의 인덱스를 구합니다.
     const roomIndex = chatArray.indexOf(chatContainer) + 1;
-    // console.log("Room Index: " + roomIndex);
-
-    // 사용자가 입력한 질문(메시지)을 가져옵니다.
-    const userQuestion = chatContainer
-        .querySelector('textarea')
-        .value;
-    // HTML 태그가 포함된 특수 문자를 이스케이프 처리하여 안전하게 변환합니다.
+    const userQuestion = chatContainer.querySelector('textarea').value;
     const safeUserQuestion = escapeHtml(userQuestion);
 
-    // 사용자가 입력한 질문이 비어 있지 않은 경우에만 메시지를 전송합니다.
     if (safeUserQuestion.trim() !== '') {
-        // 유저 메세지의 인덱스를 구합니다.
         const userMessages = chatContainer.querySelectorAll('.chat-message.user');
         let userMessageIndex = userMessages.length + 1;
-        // console.log("User message index: " + userMessageIndex);
 
-        // 사용자 질문을 HTML로 생성합니다.
-        const userQuestionHTML = '<span>' + safeUserQuestion + '</span><img class="icon' +
-                '" src="https://img.icons8.com/ios-glyphs/30/000000/user.png" alt="User">';
+        const userQuestionHTML = '<span>' + safeUserQuestion + '</span><img class="icon" src="https://img.icons8.com/ios-glyphs/30/000000/user.png" alt="User">';
 
-        // 사용자 질문을 데이터베이스에 저장하기 위한 AJAX 요청 데이터를 준비합니다.
-        let insertUserJsonData = {
+        const insertUserJsonData = {
             'dataId': id,
             'userId': userId,
             'roomIndex': roomIndex,
             'messageIndex': userMessageIndex,
             'userQuestion': userQuestionHTML
         };
-        let insertUserJsonDataString = JSON.stringify(insertUserJsonData);
 
         try {
-            // AJAX 요청이 성공하면 사용자 질문을 채팅창에 추가합니다.
-            const ajaxResult = await ajaxInsertUserQuestion(insertUserJsonDataString);
+            await ajaxInsertUserQuestion(JSON.stringify(insertUserJsonData));
+            chatContainer.querySelector('textarea').value = '';
+
+            // 전처리 요청
+            const requestPreData = {
+                'userId': userId,
+                'dataId': id,
+                'roomId': roomIndex,
+                'userMessage': safeUserQuestion
+            };
+
+            const ajaxResult = await ajaxPreProcessingData(JSON.stringify(requestPreData));
+
             if (ajaxResult) {
-                // 사용자 질문을 채팅창에 HTML로 추가합니다.
-                let userMessageHTML = document.createElement('div');
-                userMessageHTML.className = 'chat-message user';
-                userMessageHTML.innerHTML = userQuestionHTML;
-                chatContainer
-                    .querySelector('.chat-body')
-                    .appendChild(userMessageHTML);
-                // 질문 입력란을 비웁니다.
-                chatContainer
-                    .querySelector('textarea')
-                    .value = '';
-                // 채팅창을 스크롤하여 새 메시지가 보이도록 합니다.
-                chatContainer
-                    .querySelector('.chat-body')
-                    .scrollTop = chatContainer
-                    .querySelector('.chat-body')
-                    .scrollHeight;
+                let keywordContent = '';
+                let uniqueIndex = 0;
 
-                // 데이터 전처리 작업을 위한 AJAX 요청 데이터를 준비합니다.
-                let requestJsonPreProcessingData = {
-                    'userId': userId,
-                    'dataId': id,
-                    'roomId': roomIndex,
-                    'userMessage': safeUserQuestion
-                };
-                let requestJsonPreProcessingDataString = JSON.stringify(
-                    requestJsonPreProcessingData
-                );
-
-                try {
-                    // 데이터 전처리 작업을 위한 AJAX 요청을 비동기적으로 실행합니다.
-                    const ajaxResult = await ajaxPreProcessingData(
-                        requestJsonPreProcessingDataString
-                    );
-                    if (ajaxResult) {
-                        // 봇 메세지 HTML을 생성하고 추가합니다.
-                        let botAnswerHTML = document.createElement('div');
-                        botAnswerHTML.className = 'chat-message bot';
-
-                        // 데이터 전처리된 키워드의 HTML을 생성합니다.
-                        let keywordContent = '';
-                        let uniqueIndex = 0;
-                        if (ajaxResult.body.length > 0 && ajaxResult.body[0].keyword && ajaxResult.body[0].keyword.length > 0) {
-                            let uniqueBaseIndex = Date.now();
-                            const keywords = ajaxResult.body[0].keyword;
-
-                            keywords.forEach(function (keyword, index) {
-                                if (keyword.trim() !== '') {
-                                    uniqueIndex = uniqueBaseIndex++;
-                                    const isLast = index === keywords.length - 1;
-                                    keywordContent += '<span><em>' + keyword + (isLast ? '' : ',') + '</em></span>';
-
-                                    // 삭제 버튼 기능 복구 시 아래 주석을 사용할 수 있습니다:
-                                    /*
-                                    keywordContent += '<span><em>' + keyword +
-                                        '</em> <button class="delete-keyword-btn" data-index="' + uniqueIndex + '" onclick="deleteKeyword(this)">삭제</button></span>';
-                                    */
-                                }
-                            });
-                        } else {
-                            keywordContent = '키워드 없음<br>';
+                if (ajaxResult.body.length > 0 && ajaxResult.body[0].keyword) {
+                    const keywords = ajaxResult.body[0].keyword;
+                    let uniqueBaseIndex = Date.now();
+                    keywords.forEach((keyword, index) => {
+                        if (keyword.trim() !== '') {
+                            uniqueIndex = uniqueBaseIndex++;
+                            const isLast = index === keywords.length - 1;
+                            keywordContent += '<span><em>' + keyword + (isLast ? '' : ',') + '</em></span>';
                         }
-
-                        // 봇의 응답 메시지를 HTML로 생성합니다.
-                        let botMessageHTML = '<img class="icon" src="https://img.icons8.com/ios-glyphs/30/000000/chatbot.png' +
-                                '" alt="Bot"><span>';
-
-                        if (keywordContent.trim() === '' || keywordContent === '키워드 없음<br>') {
-                            botMessageHTML += '입력하신 검색어에 해당하는 키워드를 찾을 수 없습니다. 다시 시도해 주세요.<br>';
-                        } else {
-                            botMessageHTML += '해당 키워드로 검색한 결과입니다. [' + keywordContent + ']<br><br>';
-
-                            // 검색 결과가 없거나 하나인 경우를 처리합니다.
-                            if (ajaxResult.body.length == 1 && !ajaxResult.body[0].diaryTitle) {
-                                botMessageHTML += '검색 결과가 없습니다. 불필요한 키워드들을 제외하여 검색 정확도를 높이세요.';
-                            } else if (ajaxResult.body.length == 1) {
-                                botMessageHTML += '<strong>제목: </strong>' + ajaxResult
-                                    .body[0]
-                                    .diaryTitle + '<br><strong>날짜: </strong>' + ajaxResult
-                                    .body[0]
-                                    .writeDate + '<br><strong>내용: </strong>' + ajaxResult
-                                    .body[0]
-                                    .diaryContent;
-                            } else if (ajaxResult.body.length > 1) {
-                                ajaxResult
-                                    .body
-                                    .forEach(function (diary) {
-                                        uniqueIndex++;
-                                        botMessageHTML += '<div class="diary-entry"><strong>제목: </strong>' + diary.diaryTitle + '   <stro' +
-                                                'ng>날짜: </strong>' + diary.writeDate + '<br><button class="toggle-content-btn" ' +
-                                                'data-index="' + uniqueIndex + '">내용 보기</button><div class="diary-content" id="' +
-                                                'diary-content-' + uniqueIndex + '" style="display: none;">' + diary.diaryContent +
-                                                '</div></div>';
-                                    });
-                            }
-                        }
-
-                        botMessageHTML += '</span>';
-                        botAnswerHTML.innerHTML = botMessageHTML;
-                        const chatBody = chatContainer.querySelector('.chat-body');
-                        chatBody.appendChild(botAnswerHTML);
-                        // 새로운 봇 메시지가 보이도록 스크롤을 조정합니다.
-                        chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
-
-                        const botMessages = chatContainer.querySelectorAll('.chat-message.bot');
-                        const botMessageIndex = Array
-                            .from(botMessages)
-                            .indexOf(botAnswerHTML) + 1;
-                        // console.log("Bot message index: " + botMessageIndex);
-
-                        // 봇의 응답 메시지를 데이터베이스에 저장하기 위한 AJAX 요청 데이터를 준비합니다.
-                        let insertBotJsonData = {
-                            'dataId': id,
-                            'userId': userId,
-                            'roomIndex': roomIndex,
-                            'messageIndex': botMessageIndex,
-                            'botAnswer': botAnswerHTML.innerHTML
-                        };
-                        let insertBotJsonDataString = JSON.stringify(insertBotJsonData);
-
-                        try {
-                            // 봇의 응답 메시지를 데이터베이스에 저장하는 AJAX 요청을 실행합니다.
-                            const ajaxResultBot = await ajaxInsertBotAnswer(insertBotJsonDataString);
-                            if (ajaxResultBot) {
-                                // console.log("봇 대답 HTML 요소 추가에 성공하였습니다.");
-                            } else {
-                                console.log("봇 대답 HTML 요소 추가에 실패하였습니다.");
-                            }
-                        } catch (error) {
-                            console.error("봇 대답 AJAX 요청 중 오류 발생:", error);
-                        }
-                    } else {
-                        console.log("데이터 전처리에 실패하였습니다.");
-                    }
-                } catch (error) {
-                    console.error("AJAX 요청 중 오류 발생:", error);
+                    });
+                } else {
+                    keywordContent = '키워드 없음<br>';
                 }
 
-                // 일기 내용을 다시 로드하는 함수를 호출합니다.
-                openDiaryContent();
-            } else {
-                console.log("사용자 질문 HTML 요소 추가에 실패하였습니다.");
+                let botMessageHTML = '<img class="icon" src="https://img.icons8.com/ios-glyphs/30/000000/chatbot.png" alt="Bot"><span>';
+
+                if (keywordContent.trim() === '' || keywordContent === '키워드 없음<br>') {
+                    botMessageHTML += '입력하신 검색어에 해당하는 키워드를 찾을 수 없습니다. 다시 시도해 주세요.<br>';
+                } else {
+                    botMessageHTML += '해당 키워드로 검색한 결과입니다. [' + keywordContent + ']<br><br>';
+
+                    if (ajaxResult.body.length == 1 && !ajaxResult.body[0].diaryTitle) {
+                        botMessageHTML += '검색 결과가 없습니다. 불필요한 키워드들을 제외하여 검색 정확도를 높이세요.';
+                    } else if (ajaxResult.body.length == 1) {
+                        botMessageHTML += '<strong>제목: </strong>' + ajaxResult.body[0].diaryTitle + '<br><strong>날짜: </strong>' + ajaxResult.body[0].writeDate + '<br><strong>내용: </strong>' + ajaxResult.body[0].diaryContent;
+                    } else if (ajaxResult.body.length > 1) {
+                        ajaxResult.body.forEach(function (diary) {
+                            uniqueIndex++;
+                            botMessageHTML += '<div class="diary-entry"><strong>제목: </strong>' + diary.diaryTitle +
+                                '   <strong>날짜: </strong>' + diary.writeDate + '<br><button class="toggle-content-btn" ' +
+                                'data-index="' + uniqueIndex + '">내용 보기</button><div class="diary-content" id="' +
+                                'diary-content-' + uniqueIndex + '" style="display: none;">' + diary.diaryContent +
+                                '</div></div>';
+                        });
+                    }
+                }
+
+                botMessageHTML += '</span>';
+
+                const botMessages = chatContainer.querySelectorAll('.chat-message.bot');
+                const botMessageIndex = botMessages.length + 1;
+
+                const insertBotJsonData = {
+                    'dataId': id,
+                    'userId': userId,
+                    'roomIndex': roomIndex,
+                    'messageIndex': botMessageIndex,
+                    'botAnswer': botMessageHTML
+                };
+
+                await ajaxInsertBotAnswer(JSON.stringify(insertBotJsonData));
+
+                // ❌ 여기까지 DB에 저장만 하고, 메시지는 직접 추가하지 않음
+                // ✅ WebSocket으로 푸시되면 그때 UI에 추가됨
             }
+
+            openDiaryContent();  // 필요 시 유지
         } catch (error) {
-            console.error("사용자 질문 AJAX 요청 중 오류 발생:", error);
+            console.error("메시지 처리 중 오류:", error);
         }
     }
 }
+
 
 // 채팅 컨테이너를 전환하는 함수
 // 사용자가 선택한 질문에 대응하는 채팅창으로 화면을 전환하는 함수입니다.
@@ -1164,7 +1090,7 @@ function ajaxLoadAllData(selectJsonDataString) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/selectAllData",
+            url: "http://localhost:8080/diary/selectAllData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1208,7 +1134,7 @@ function ajaxInsertQuestionItem(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/insertTalkToBotAll",
+            url: "http://localhost:8080/diary/insertTalkToBotAll",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1239,7 +1165,7 @@ function ajaxUpdateChatContainer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/updateChatContainer",  // ✅ 수정된 URL
+            url: "http://localhost:8080/diary/updateChatContainer",  // ✅ 수정된 URL
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1270,7 +1196,7 @@ function ajaxInsertUserQuestion(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/insertTalkToBotData",
+            url: "http://localhost:8080/diary/insertTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1303,7 +1229,7 @@ function ajaxInsertBotAnswer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/insertTalkToBotData",
+            url: "http://localhost:8080/diary/insertTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1336,7 +1262,7 @@ function ajaxPreProcessingData(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/PreProcessingData",
+            url: "http://localhost:8080/diary/PreProcessingData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1369,7 +1295,7 @@ function ajaxDropTable(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/dropTable",
+            url: "http://localhost:8080/diary/dropTable",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1402,7 +1328,7 @@ function ajaxInsertExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/insertExcludedKeyword",
+            url: "http://localhost:8080/diary/insertExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1435,7 +1361,7 @@ function ajaxSelectExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/selectExcludedKeyword",
+            url: "http://localhost:8080/diary/selectExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1481,7 +1407,7 @@ function ajaxUpdateBotAnswer(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/updateTalkToBotData",
+            url: "http://localhost:8080/diary/updateTalkToBotData",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1514,7 +1440,7 @@ function ajaxDeleteExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/deleteExcludedKeyword",
+            url: "http://localhost:8080/diary/deleteExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1547,7 +1473,7 @@ function ajaxSelectInsertExcludedKeyword(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/selectInsertExcludedKeyword",
+            url: "http://localhost:8080/diary/selectInsertExcludedKeyword",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
@@ -1580,7 +1506,7 @@ function ajaxUpdateQuestionTitle(JsonData) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "https://acelifetest.com/diary/updateQuestionTitle",
+            url: "http://localhost:8080/diary/updateQuestionTitle",
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
