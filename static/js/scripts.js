@@ -329,7 +329,7 @@ async function sendMessage(id) {
 
                             // 검색 결과가 없거나 하나인 경우를 처리합니다.
                             if (ajaxResult.body.length == 1 && !ajaxResult.body[0].diaryTitle) {
-                                botMessageHTML += '검색 결과가 없습니다. 불필요한 키워드들을 삭제해서 검색 정확도를 높이세요.';
+                                botMessageHTML += '검색 결과가 없습니다. 불필요한 키워드들을 제외하여 검색 정확도를 높이세요.';
                             } else if (ajaxResult.body.length == 1) {
                                 botMessageHTML += '<strong>제목: </strong>' + ajaxResult
                                     .body[0]
